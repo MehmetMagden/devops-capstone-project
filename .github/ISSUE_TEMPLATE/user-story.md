@@ -1,9 +1,8 @@
 ---
 name: User Story
-description: Default template for creating project user stories
+about: Default template for creating project user stories
 title: 'User Story: '
 labels: user-story
-assignees: ''
 ---
 
 **As a** [role]  
