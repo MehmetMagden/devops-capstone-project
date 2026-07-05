@@ -128,6 +128,8 @@ class TestAccountService(TestCase):
     def test_get_account(self):
         """It should Read a single Account"""
         account = self._create_accounts(1)[0]
+        print(account.name)
+        print(account.id)
         response = self.client.get(f"/accounts/{account.id}")
         print(account.name)
         print(account.id)
@@ -135,8 +137,31 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(data["name"], account.name)
+        print(data["id"])
         
     def test_get_account_not_found(self):
         """It should return 404 when the account is not found"""
         response = self.client.get("/accounts/9999")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        
+    def test_update_accout(self):
+        """Itshould Update an existing Account"""
+        account = self._create_accounts(1)[0]
+        
+        new_account_data = account.serialize()
+        new_account_data["name"] = "Updated Name"
+        
+        response = self.client.put(
+            f"/accounts/{account.id}",
+            json=new_account_data,
+            content_type="application/json"
+        )
+        
+    def test_update_account_not_found(self):
+        """It should not update an Account that is not found"""
+
+        response = self.client.put("/accounts/999", json={})
+        
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
