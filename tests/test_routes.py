@@ -52,8 +52,7 @@ class TestAccountService(TestCase):
 
     ######################################################################
     #  H E L P E R   M E T H O D S
-    ######################################################################    def _create_accounts(self, count):
-
+    ######################################################################
 
     def _create_accounts(self, count):
         """Factory method to create accounts in bulk"""
@@ -133,72 +132,75 @@ class TestAccountService(TestCase):
         response = self.client.get(f"/accounts/{account.id}")
         print(account.name)
         print(account.id)
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(data["name"], account.name)
         print(data["id"])
-        
+
     def test_get_account_not_found(self):
         """It should return 404 when the account is not found"""
         response = self.client.get("/accounts/9999")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        
+
     def test_update_accout(self):
         """Itshould Update an existing Account"""
         account = self._create_accounts(1)[0]
-        
+
         new_account_data = account.serialize()
         new_account_data["name"] = "Updated Name"
-        
+
         response = self.client.put(
             f"/accounts/{account.id}",
             json=new_account_data,
             content_type="application/json"
         )
-        
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        updated_data = response.get_json()
+        self.assertEqual(updated_data["name"], "Updated Name")
+
     def test_update_account_not_found(self):
         """It should not update an Account that is not found"""
 
         response = self.client.put("/accounts/999", json={})
-        
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        
+
     def test_delete_account(self):
         """It should Delete an Account"""
         account = self._create_accounts(1)[0]
 
         response = self.client.delete(f"/accounts/{account.id}")
-        
+
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         get_response = self.client.get(f"/accounts/{account.id}")
         self.assertEqual(get_response.status_code, status.HTTP_404_NOT_FOUND)
-        
+
     def test_delete_account_not_found(self):
         """It should do nothing and return 204 if Account is not found"""
 
         response = self.client.delete("/accounts/9999")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        
+
     def test_get_account_list(self):
         """It should get a list of Accounts"""
 
         self._create_accounts(6)
-        
+
         response = self.client.get("/accounts")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertEqual(len(data), 6) 
+        self.assertEqual(len(data), 6)
 
     def test_get_account_empty_list(self):
         """It should return an empty list when there are no Accounts"""
 
         response = self.client.get("/accounts")
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 0)
-
-
